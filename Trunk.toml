@@ -1,0 +1,16 @@
+[build]
+target = "index.html"
+dist = "dist"
+
+[serve]
+port =3030
+
+
+[watch]
+watch_patterns = ["src/**/*.rs", "static/**"]
+
+[[hooks]]
+stage = "build"
+command = "sh"
+command_arguments = ["-c", "npx tailwindcss -i src/tailwind.css -o $TRUNK_STAGING_DIR/tailwind.css"]
+

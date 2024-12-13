@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Helvetica Neue';
+  src: url('path/to/helvetica-neue.woff2') format('woff2'),
+       url('path/to/helvetica-neue.woff') format('woff'),
+       url('path/to/helvetica-neue.ttf') format('truetype'); 
+}
+@layer base {
+	html {
+		width: 100%;
+		height: 100%;
+		margin: 0;
+	}
+  * {
+     	  font-family: "Helvetica", sans-serif !important;
+    }
+}
+@layer components {
+.app {
+    @apply h-full w-full flex flex-col items-center p-2 rounded-lg; /* Default "portrait-friendly" vibes */
+  }
+
+  @media (orientation: landscape) {
+    .app {
+      @apply h-screen w-full max-w-[50vw] p-6 min-h-[30rem] rounded-lg; /* Landscape mode, giving that "phone shape" */
+    }
+  }
+	body {
+		@apply flex justify-center 	}
+	*::-webkit-scrollbar {
+		display: none;
+	}
+	* {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+		font-family: Raleway, sans-serif;
+	}
+}
