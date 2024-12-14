@@ -9,12 +9,13 @@ pub fn get_total_listening_time_in_ms(data: &Vec<PlaybackRecord>) -> u64 {
 }
 fn get_top_based_on_grouping<K, F>(data: &Vec<PlaybackRecord>, group_fn: F) -> Vec<(K, u64)>
 where
-    K: Eq + Hash + Clone,
+    K: Eq + Hash + Clone + Default,
     F: Fn(&PlaybackRecord) -> K,
 {
     let mut grouped_data: Vec<(K, u64)> = group_by(data, group_fn)
         .iter()
         .map(|(key, records)| (key.clone(), get_total_listening_time_in_ms(records)))
+        .filter(|(k, _)| k != &Default::default())
         .collect();
     grouped_data.sort_by(|(_, d1), (_, d2)| d2.cmp(d1));
     grouped_data
@@ -24,17 +25,39 @@ pub fn get_top_artists(data: &Vec<PlaybackRecord>) -> Vec<(String, u64)> {
         record.master_metadata_album_artist_name.clone()
     })
 }
-pub fn get_top_artists_percentages(data: &Vec<PlaybackRecord>, n: usize) -> Vec<(String, f32)> {
+pub fn get_top_percentages<T>(
+    data: &Vec<PlaybackRecord>,
+    cutoff: f32,
+    minimum_elements: usize,
+    grouping_method: T,
+) -> Vec<(String, f32)>
+where
+    T: Fn(&Vec<PlaybackRecord>) -> Vec<(String, u64)>,
+{
     let total_time = get_total_listening_time_in_ms(data);
 
-    let top_artists = get_top_artists(data);
+    let top_artists = grouping_method(data);
     let total_t = total_time as f64;
-    top_artists
+    let artists: Vec<(String, f32)> = top_artists
         .into_iter()
         .map(|(name, time)| (name, (time as f64 / total_t) as f32))
         .map(|(n, r)| (n, (r * 10000.0).round() / 100.0))
-        .filter(|(_, n)| n >= &4.0)
-        .collect()
+        .collect();
+    let mut ret = artists[..minimum_elements.clamp(0, artists.len())].to_vec();
+    let more = artists[minimum_elements.clamp(0, artists.len() - 1)..]
+        .to_vec()
+        .into_iter()
+        .filter(|(_, n)| n >= &cutoff)
+        .collect::<Vec<(String, f32)>>();
+    ret.extend(more);
+    ret
+}
+pub fn get_top_artists_percentages(
+    data: &Vec<PlaybackRecord>,
+    cutoff: f32,
+    minimum_elements: usize,
+) -> Vec<(String, f32)> {
+    get_top_percentages(data, cutoff, minimum_elements, get_top_artists)
 }
 
 pub fn get_top_songs(data: &Vec<PlaybackRecord>) -> Vec<(String, u64)> {

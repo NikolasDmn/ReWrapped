@@ -26,7 +26,7 @@ pub fn pie_chart(props: &PieChartProps) -> Html {
         }
     });
     html! {
-     <div class="flex flex-col items-center justify-center h-screen">
+     <div class="flex flex-col items-center justify-center h-full">
       <div class="flex flex-row items-center justify-center w-full">
         <a class="logo-container w-1/3 flex flex-col items-center mb-10" href="/">
           <img src="/assets/logo/logo.svg" alt="logo" class="logo mb-4 w-60" />

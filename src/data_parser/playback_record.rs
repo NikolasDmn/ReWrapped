@@ -1,7 +1,10 @@
+use std::cell::UnsafeCell;
+
 use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use gloo::{console::log, utils::format};
 use rayon::prelude::*;
-use serde::{Deserialize, Serialize};
+use serde::{ser, Deserialize, Serialize};
+use serde_json::{from_slice, from_value, Deserializer, Value};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct PlaybackRecord {
@@ -45,11 +48,18 @@ struct UnsanitizedPlaybackRecord {
     pub offline_timestamp: Option<u64>,
     pub incognito_mode: bool,
 }
+
 impl UnsanitizedPlaybackRecord {
-    pub fn from_json(json: &str) -> Result<Vec<Self>, serde_json::Error> {
-        serde_json::from_str(json)
+    pub fn from_json(json: &[u8]) -> Result<Vec<Self>, serde_json::Error> {
+        let json_values: Vec<serde_json::Value> = from_slice(json)?;
+
+        json_values
+            .into_par_iter()
+            .map(|value| from_value(value))
+            .collect()
     }
 }
+
 impl From<UnsanitizedPlaybackRecord> for PlaybackRecord {
     fn from(raw: UnsanitizedPlaybackRecord) -> Self {
         PlaybackRecord {
@@ -84,30 +94,25 @@ impl From<UnsanitizedPlaybackRecord> for PlaybackRecord {
     }
 }
 impl PlaybackRecord {
-    pub fn from_json(json: &str) -> Result<Vec<PlaybackRecord>, serde_json::Error> {
+    pub fn from_json(json: &[u8]) -> Result<Vec<PlaybackRecord>, serde_json::Error> {
         let unsanitized = UnsanitizedPlaybackRecord::from_json(json);
         if let Err(e) = unsanitized {
             return Err(e);
         }
         Ok(unsanitized
-            .unwrap()
-            .into_iter()
+            .unwrap_or(vec![])
+            .into_par_iter()
             .map(|ur| PlaybackRecord::from(ur))
             .collect())
     }
-    pub fn from_jsons(jsons: &Vec<String>) -> Result<Vec<PlaybackRecord>, serde_json::Error> {
+    pub fn from_jsons(jsons: &[Vec<u8>]) -> Result<Vec<PlaybackRecord>, serde_json::Error> {
         let data_files: Result<Vec<Vec<PlaybackRecord>>, serde_json::Error> = jsons
-            .iter()
-            .map(|json| {
-                let x = PlaybackRecord::from_json(json);
-                log!(format!("{:?}", x));
-                x
-            })
+            .into_par_iter()
+            .map(|json| PlaybackRecord::from_json(json))
             .collect();
         if let Err(e) = data_files {
-            log!(format!("Error: {:?}", e).as_str());
             return Err(e);
         }
-        Ok(data_files.unwrap().into_iter().flatten().collect())
+        Ok(data_files.unwrap_or(vec![]).into_iter().flatten().collect())
     }
 }
