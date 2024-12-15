@@ -15,13 +15,26 @@ pub struct PieChartData {
 pub struct PieChartProps {
     pub data: Vec<PieChartData>,
 }
+impl PieChartData {
+    pub fn convert(data: Vec<(String, f32)>) -> Vec<Self> {
+        let colours = ["#189a46", "#3eaf61", "#5bc47b", "#76d996", "#91eeb1"];
+        data.into_iter()
+            .zip(colours)
+            .map(|((name, value), color)| Self {
+                name,
+                value,
+                color: color.to_string(),
+            })
+            .collect()
+    }
+}
 
 #[function_component(PieChart)]
 pub fn pie_chart(props: &PieChartProps) -> Html {
     use_effect_with(props.clone(), {
         move |data| {
             let json_data = to_string(&data.data).unwrap();
-            show_donut_chart(&json_data);
+            create_donut_chart(&json_data);
             || ()
         }
     });
@@ -34,6 +47,6 @@ pub fn pie_chart(props: &PieChartProps) -> Html {
 
 #[wasm_bindgen(module = "/src/views/components/charts/donut_chart.js")]
 extern "C" {
-    #[wasm_bindgen(js_name = "show_donut_chart")]
-    pub fn show_donut_chart(data: &str);
+    #[wasm_bindgen(js_name = "create_donut_chart")]
+    pub fn create_donut_chart(data: &str);
 }

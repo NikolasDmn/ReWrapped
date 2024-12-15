@@ -3,6 +3,7 @@ use std::{str::FromStr, thread};
 
 use crate::data_parser::playback_record::PlaybackRecord;
 use crate::views::components::charts::bar_chart::{BarChart, BarChartData};
+use crate::views::components::charts::polar_area_chart::{PolarAreaChart, PolarAreaChartData};
 use crate::{
     views::components::{
         charts::donut_chart::{PieChart, PieChartData},
@@ -23,6 +24,7 @@ pub enum ChartType {
     Albums,
     Week,
     Months,
+    Days,
     Day,
     Platform,
     Country,
@@ -31,14 +33,41 @@ pub enum ChartType {
 impl ChartType {
     fn get_chart(&self, dt: Vec<(String, f32)>) -> Html {
         match self {
-            Self::Artists | Self::Songs | Self::Albums => {
-                html! {<PieChart data={from_raw_to_pie_data(dt)}/>}
+            Self::Artists | Self::Songs | Self::Albums | Self::Days => {
+                html! {<PieChart data={PieChartData::convert(dt)}/>}
             }
 
             Self::Months | Self::Week | Self::Platform | Self::Country => {
                 html! {<BarChart data={BarChartData::convert(dt)}/>}
             }
-            Self::Day => todo!(),
+            Self::Day => {
+                html! {<PolarAreaChart data={PolarAreaChartData::convert(dt)}/>}
+            }
+        }
+    }
+    fn get_message(&self) -> String {
+        match self {
+            Self::Artists | Self::Songs | Self::Albums => format!(
+                "How much of your favorite {} occupied your year?",
+                self.to_string().to_lowercase()
+            ),
+            Self::Week => format!("Which day of the week did you listen to music the most?"),
+            Self::Months => format!("Which month did you listen to music the most?"),
+            Self::Day => format!("Which hour of the day did you listen to music the most?"),
+            Self::Country => format!("From where did you listen to music the most?"),
+            Self::Platform => format!("Which platform did you use to listen to music the most?"),
+            Self::Days => format!("Which days did you listen to music the most this year?"),
+        }
+    }
+    fn get_title(&self) -> String {
+        match self {
+            Self::Artists | Self::Songs | Self::Albums | Self::Months | Self::Days => {
+                format!("Top {}", self)
+            }
+            Self::Week => format!("Day of the week"),
+            Self::Day => format!("Hour of the day"),
+            Self::Country => format!("Countries"),
+            Self::Platform => format!("Platforms"),
         }
     }
 }
@@ -52,7 +81,8 @@ impl std::str::FromStr for ChartType {
             "album" | "albums" => Ok(Self::Albums),
             "week" | "weeks" => Ok(Self::Week),
             "months" | "month" => Ok(Self::Months),
-            "day" | "days" => Ok(Self::Day),
+            "day" => Ok(Self::Day),
+            "days" => Ok(Self::Days),
             "platform" | "platforms" => Ok(Self::Platform),
             "country" | "countries" => Ok(Self::Country),
             _ => Err(()),
@@ -70,15 +100,15 @@ impl std::fmt::Display for ChartType {
                 Self::Albums => "Albums".to_string(),
                 Self::Week => "Week".to_string(),
                 Self::Months => "Months".to_string(),
-                Self::Day => "Day".to_string(),
+                Self::Days => "Days".to_string(),
                 Self::Platform => "Platform".to_string(),
                 Self::Country => "Country".to_string(),
+                Self::Day => "Day".to_string(),
             }
         )
     }
 }
 fn from_raw_to_pie_data(data: Vec<(String, f32)>) -> Vec<PieChartData> {
-    log!(format!("{:?}", data));
     let colours = [
         "#91eeb2", "#65e793", "#39e074", "#1fc65a", "#189a46", "#116e32",
     ];
@@ -122,7 +152,8 @@ pub fn chart_view(props: &ChartViewProps) -> Html {
                 ChartType::Months => queries::get_months_distribution(dt),
                 ChartType::Platform => queries::get_top_platforms(dt),
                 ChartType::Country => queries::get_top_countries(dt),
-                ChartType::Day => todo!(),
+                ChartType::Days => queries::get_top_days(dt, 5),
+                ChartType::Day => queries::get_hours_of_the_day_distribution(dt),
             });
             loading.set(false);
         }
@@ -135,12 +166,12 @@ pub fn chart_view(props: &ChartViewProps) -> Html {
           <h2 class="text-4xl text-center"> { "ReWrapped" } </h2>
         </a>
         <p class="text-6xl text-text-base ml-4 text-center w-full">
-                   { format!("Your Top {}", props.chart_type.to_string()) }
+                   { props.chart_type.get_title() }
         </p>
       </div>
 
       <div class="w-full  h-full flex flex-col items-center">
-        <h3 class="text-2xl font-medium mb-4 text-gray-700"> { format!("How much of your favorite {} occupied your year?", props.chart_type.to_string().to_lowercase()) } </h3>
+        <h3 class="text-2xl font-medium mb-4 text-gray-700"> {props.chart_type.get_message()  } </h3>
             if *loading {
                 <span class="loading loading-dots loading-lg"></span>
             }

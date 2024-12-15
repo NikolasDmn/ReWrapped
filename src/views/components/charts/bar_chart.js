@@ -19,8 +19,27 @@ export function create_bar_chart(data) {
       },
     },
     xaxis: {
-      position: 'top',
       categories: categories,
+      labels: {
+        show: true,
+      },
+      axisBorder: {
+        show: false,
+      },
+      axisTicks: {
+        show: false,
+      },
+    },
+    yaxis: {
+      labels: {
+        show: false,
+      },
+      axisBorder: {
+        show: false,
+      },
+      axisTicks: {
+        show: false,
+      },
     },
     title: {
       show: false,
@@ -35,10 +54,18 @@ export function create_bar_chart(data) {
       colors: ["#121212"],
     },
     legend: {
-      show: false, // Hides the legend
+      show: false,
+    },
+    grid: {
+      show: false,
+    },
+    plotOptions: {
+      bar: {
+        borderRadius: 6, // Add this to create rounded corners
+        distributed: true, // Rounds individual bars
+      },
     },
   };
-  // Ensure the chart container exists
   const chartContainer = document.getElementById("bar-chart");
   if (!chartContainer) {
     console.error("Error: <div id='bar-chart'> not found in the DOM.");
@@ -48,7 +75,7 @@ export function create_bar_chart(data) {
   while (chartContainer.firstChild) {
     chartContainer.removeChild(chartContainer.firstChild);
   }
-  // Render the chart in the container
+  //render the chart in the container
   const chart = new ApexCharts(chartContainer, chartConfig);
   chart.render();
 }

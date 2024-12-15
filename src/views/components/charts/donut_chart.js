@@ -1,4 +1,4 @@
-export function show_donut_chart(data) {
+export function create_donut_chart(data) {
   // Parse the data (assumes data is a JSON string passed from Rust)
   const parsedData = JSON.parse(data);
 
@@ -16,6 +16,12 @@ export function show_donut_chart(data) {
       toolbar: {
         show: false,
       },
+      axisBorder: {
+        show: false,
+      },
+      axisTicks: {
+        show: false,
+      },
     },
     labels: labels,
     colors: colors,
@@ -25,7 +31,8 @@ export function show_donut_chart(data) {
     dataLabels: {
       enabled: true,
       formatter: function (val, opts) {
-        return opts.w.globals.labels[opts.seriesIndex];
+        return `${opts.w.globals.labels[opts.seriesIndex]}: ${opts.w.globals.series[opts.seriesIndex]} %`;
+
       },
     },
     stroke: {
@@ -34,7 +41,28 @@ export function show_donut_chart(data) {
       colors: ["#121212"],
     }, legend: {
       show: false, // Hides the legend
+    }, xaxis: {
+      labels: {
+        show: false,
+      },
+      axisBorder: {
+        show: false,
+      },
+      axisTicks: {
+        show: false,
+      },
     },
+    yaxis: {
+      labels: {
+        show: false,
+      },
+      axisBorder: {
+        show: false,
+      },
+    },
+    grid: {
+      show: false,
+    }
 
   };
 

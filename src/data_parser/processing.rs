@@ -74,9 +74,10 @@ where
 /// // filtered will be:
 /// // vec![PlaybackRecord { id: 2 }]
 /// ```
-pub(crate) fn filter_by<F>(data: &Vec<PlaybackRecord>, filter_fn: F) -> Vec<PlaybackRecord>
+pub(crate) fn filter_by<F, K>(data: &Vec<K>, filter_fn: F) -> Vec<K>
 where
-    F: Fn(&PlaybackRecord) -> bool,
+    F: Fn(&K) -> bool,
+    K: Clone,
 {
     data.iter()
         .filter(|&record| filter_fn(record))
@@ -150,13 +151,10 @@ where
 /// // top_n will be:
 /// // vec![PlaybackRecord { id: 2 }, PlaybackRecord { id: 3 }]
 /// ```
-pub(crate) fn sort_by_top_n<F>(
-    data: &Vec<PlaybackRecord>,
-    n: usize,
-    sorting_fn: F,
-) -> Vec<PlaybackRecord>
+pub(crate) fn sort_by_top_n<F, K>(data: &Vec<K>, n: usize, sorting_fn: F) -> Vec<K>
 where
-    F: Fn(&PlaybackRecord, &PlaybackRecord) -> Ordering,
+    F: Fn(&K, &K) -> Ordering,
+    K: Clone,
 {
     let mut bin_heap = BinaryHeap::from_vec_cmp(data.clone(), sorting_fn);
     (0..n.clamp(0, data.len()))

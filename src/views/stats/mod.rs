@@ -89,6 +89,28 @@ pub fn stats_home() -> Html {
        >
            {"Country"}
        </button>
+        <button
+           class="btn btn-primary text-2xl font-semibold text-white py-3 cursor-pointer rounded-lg h-16"
+           onclick={Callback::from({
+               let navigator = navigator.clone();
+               move |_| {
+                   navigator.push(&Route::StatCharts { chart_type: ChartType::Days });
+               }
+           })}
+       >
+           {"Days"}
+       </button>
+    <button
+           class="btn btn-primary text-2xl font-semibold text-white py-3 cursor-pointer rounded-lg h-16"
+           onclick={Callback::from({
+               let navigator = navigator.clone();
+               move |_| {
+                   navigator.push(&Route::StatCharts { chart_type: ChartType::Day });
+               }
+           })}
+       >
+           {"Day"}
+       </button>
        </div></div>
        }
 }
