@@ -67,7 +67,7 @@ pub fn FileUploadView() -> Html {
 
     let on_button_click = {
         let navigator = navigator.clone();
-        Callback::from(move |_| navigator.push(&Route::TopArtists))
+        Callback::from(move |_| navigator.push(&Route::StatsHome))
     };
     let on_state_change = {
         let file_contents = file_contents.clone();

@@ -1,4 +1,6 @@
-use std::{hash::Hash, i64, u64};
+use std::{hash::Hash, i64, str::FromStr, u64};
+
+use chrono::{Datelike, Month};
 
 use super::{
     playback_record::PlaybackRecord,
@@ -59,6 +61,20 @@ pub fn get_top_artists_percentages(
 ) -> Vec<(String, f32)> {
     get_top_percentages(data, cutoff, minimum_elements, get_top_artists)
 }
+pub fn get_top_songs_percentages(
+    data: &Vec<PlaybackRecord>,
+    cutoff: f32,
+    minimum_elements: usize,
+) -> Vec<(String, f32)> {
+    get_top_percentages(data, cutoff, minimum_elements, get_top_songs)
+}
+pub fn get_top_albums_percentages(
+    data: &Vec<PlaybackRecord>,
+    cutoff: f32,
+    minimum_elements: usize,
+) -> Vec<(String, f32)> {
+    get_top_percentages(data, cutoff, minimum_elements, get_top_albums)
+}
 
 pub fn get_top_songs(data: &Vec<PlaybackRecord>) -> Vec<(String, u64)> {
     get_top_based_on_grouping(data, |record| record.master_metadata_track_name.clone())
@@ -69,12 +85,49 @@ pub fn get_top_albums(data: &Vec<PlaybackRecord>) -> Vec<(String, u64)> {
         record.master_metadata_album_album_name.clone()
     })
 }
-pub fn get_top_countries(data: &Vec<PlaybackRecord>) -> Vec<(String, u64)> {
+pub fn get_top_countries(data: &Vec<PlaybackRecord>) -> Vec<(String, f32)> {
     get_top_based_on_grouping(data, |record| record.conn_country.clone())
+        .into_iter()
+        .map(|(s, u)| (s, (u as f32 / 60000.0).round()))
+        .collect()
 }
 
-pub fn get_top_platforms(data: &Vec<PlaybackRecord>) -> Vec<(String, u64)> {
+pub fn get_top_platforms(data: &Vec<PlaybackRecord>) -> Vec<(String, f32)> {
     get_top_based_on_grouping(data, |record| record.platform.clone())
+        .into_iter()
+        .map(|(s, u)| (s, (u as f32 / 60000.0).round()))
+        .collect()
+}
+
+pub fn get_day_distribution(data: &Vec<PlaybackRecord>) -> Vec<(String, f32)> {
+    let mut res: Vec<(chrono::Weekday, f32)> = group_by(data, |record| record.ts.weekday())
+        .into_iter()
+        .map(|(weekday, records)| {
+            (
+                weekday,
+                (get_total_listening_time_in_ms(&records) as f64 / 60000.0),
+            )
+        })
+        .map(|(weekday, r)| (weekday, r.round() as f32))
+        .collect();
+    res.sort_by_key(|(weekday, _)| weekday.number_from_monday());
+    res.into_iter()
+        .map(|(weekday, r)| (weekday.to_string(), r))
+        .collect()
+}
+pub fn get_months_distribution(data: &Vec<PlaybackRecord>) -> Vec<(String, f32)> {
+    let mut ret: Vec<(String, f32)> = group_by(data, |record| record.ts.format("%B").to_string())
+        .into_iter()
+        .map(|(month, records)| {
+            (
+                month,
+                (get_total_listening_time_in_ms(&records) as f64 / 60000.0),
+            )
+        })
+        .map(|(weekday, r)| (weekday, r.round() as f32))
+        .collect();
+    ret.sort_by_key(|(month, _)| Month::from_str(month).unwrap().number_from_month());
+    ret
 }
 /// Returns playback duration of the `true` and `false` values of any boolean field in the `[PlaybackRecord]`
 /// struct.
