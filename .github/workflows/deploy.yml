@@ -36,7 +36,7 @@ jobs:
       - name: Add wasm target
         run: |
           rustup target add wasm32-unknown-unknown
-      - name: Install jellyfin
+      - name: Install daisyui
         run: npm i -D daisyui@latest
         # This prevents an issue from build.rs
       - name: Build the Rust WASM app and all of its assets
@@ -47,6 +47,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
+          enablement: true
           path: "./dist"
 
   deploy:
