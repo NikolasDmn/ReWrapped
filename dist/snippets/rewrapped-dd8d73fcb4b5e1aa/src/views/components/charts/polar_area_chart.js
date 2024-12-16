@@ -26,10 +26,10 @@ export function create_polar_area_chart(data) {
       style: {
         fontSize: "12px",
         fontWeight: "bold",
-        colors: ["#121212"],
+        color: "#121212",
       },
       background: {
-        enabled: false,
+        enabled: true,
         foreColor: "#121212",
         padding: 4,
         borderRadius: 2,
@@ -58,6 +58,10 @@ export function create_polar_area_chart(data) {
         spokes: {
           strokeWidth: 0,
         },
+        polygons: {
+          strokeWidth: 3,
+          strokeColor: "#121212"
+        }
       },
       pie: {
         borderRadius: 6,

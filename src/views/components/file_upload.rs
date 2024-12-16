@@ -116,8 +116,12 @@ impl Component for FileInput {
                 })}
               />}
             else {
-
-                    <div class="flex items-center justify-center w-1/2 bg-primary text-xl font-semibold text-white py-3 rounded-lg">{"Uploading "}<span class="loading loading-dots loading-lg"></span></div>
+                <div class ="flex flex-col items-center justify-center w-full h-full ">
+                    <div class="flex items-center justify-center w-1/2 bg-primary text-xl font-semibold text-white py-3 rounded-lg">{"Uploading... "}</div>
+                    <p class="text-base text-gray-400 mt-8 hover:underline text-center">
+                        { "This may take a while..." }
+                    </p>
+                </div>
             }
             </div>
 

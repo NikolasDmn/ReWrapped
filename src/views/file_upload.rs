@@ -80,10 +80,6 @@ pub fn FileUploadView() -> Html {
 
             file_contents.set(new_contents);
 
-            log!(format!(
-                "Ammount expected: {}. Provided ammount: {}",
-                &*file_ammount, current_ammount
-            ));
             if *file_ammount <= current_ammount {
                 file_state.set(FileState::Processing);
             }
@@ -97,17 +93,19 @@ pub fn FileUploadView() -> Html {
         </div>
 
         <div class="flex flex-col items-center justify-center">
-            if *file_state  == FileState::NotUploaded || *file_state == FileState::Uploading{
-                <FileInput on_file_loaded={on_state_change} on_change_upload_state={on_finish_loading} on_file_ammount= {on_file_ammount}/>
+            if *file_state == FileState::Processed {
+                <button onclick={on_button_click} class="btn btn-primary text-4xl font-semibold text-white py-3 cursor-pointer rounded-lg h-16"> {"Get ReWrapped!"}</button>
+            } else if *file_state == FileState::Processing {
+                <div class="flex items-center justify-center w-1/2 bg-primary text-xl font-semibold text-white py-3 rounded-lg">{"Proccessing..."}</div>
+                <p class="text-base text-gray-400 mt-8 hover:underline text-center">
+                        { "This may take a while..." }
+                </p>
+            } else {<FileInput on_file_loaded={on_state_change} on_change_upload_state={on_finish_loading} on_file_ammount= {on_file_ammount}/>
                 <p class="text-base text-gray-400 mt-8 hover:underline text-center">
                     <a href="/upload-guide" >
                         { "What do I need to upload?" }
                     </a>
                 </p>
-            }else if *file_state == FileState::Processed {
-                <button onclick={on_button_click} class="btn btn-primary text-4xl font-semibold text-white py-3 cursor-pointer rounded-lg h-16"> {"Get ReWrapped!"}</button>
-            } else {
-                <div class="flex items-center justify-center w-1/2 bg-primary text-xl font-semibold text-white py-3 rounded-lg">{"Proccessing "}<span class="loading loading-dots loading-lg"></span></div>
             }
         </div>
 
