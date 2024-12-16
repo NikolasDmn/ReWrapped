@@ -41,6 +41,12 @@ jobs:
         # This prevents an issue from build.rs
       - name: Build the Rust WASM app and all of its assets
         run: trunk build --public-url ${{ github.event.repository.name }} --release
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          enablement: true
+          path: "./dist"
+
 
       
 
@@ -58,11 +64,7 @@ jobs:
     steps:
       - name: Setup Pages
         uses: actions/configure-pages@v3
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          enablement: true
-          path: "./dist"
+      
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
