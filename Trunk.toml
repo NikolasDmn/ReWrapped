@@ -5,6 +5,8 @@ dist = "dist"
 [serve]
 port =3030
 
+[assets]
+use-sri = false
 
 [watch]
 watch_patterns = ["src/**/*.rs", "static/**"]
