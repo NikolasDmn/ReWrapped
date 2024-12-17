@@ -6,11 +6,11 @@ pub fn UploadGuide() -> Html {
                 <div class="upload-guide-container text-xl">
                    <div class="header flex items-center">
         <a class="logo-container w-1/3 flex flex-col items-center mb-20" href="/">
-            <img src="assets/logo/logo.svg" alt="logo" class="logo mb-4 w-60" />
-            <h2 class="text-4xl text-center"> { "ReWrapped" } </h2>
+            <img src="assets/logo.svg" alt="logo" class="logo mb-4 w-60" />
+            <h2 class="text-3xl text-center"> { "ReWrapped" } </h2>
         </a>
         <div class="title-container w-3/4 ">
-            <h1 class="text-8xl text-center"> { "Upload Guide" } </h1>
+            <h1 class="text-5xl text-center"> { "Upload Guide" } </h1>
         </div>
     </div>
                     <p>

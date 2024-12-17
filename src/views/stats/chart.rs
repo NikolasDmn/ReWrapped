@@ -17,6 +17,24 @@ use yew_router::{hooks::use_navigator, navigator};
 
 use crate::{data_parser::queries, views::components::data_context::DataContext};
 
+pub fn get_gradient(start_color: &str, end_color: &str, steps: usize) -> Vec<String> {
+    let start_r = u8::from_str_radix(&start_color[1..3], 16).unwrap();
+    let start_g = u8::from_str_radix(&start_color[3..5], 16).unwrap();
+    let start_b = u8::from_str_radix(&start_color[5..7], 16).unwrap();
+    let end_r = u8::from_str_radix(&end_color[1..3], 16).unwrap();
+    let end_g = u8::from_str_radix(&end_color[3..5], 16).unwrap();
+    let end_b = u8::from_str_radix(&end_color[5..7], 16).unwrap();
+    (0..steps)
+        .map(|i| {
+            let t = i as f32 / (steps - 1) as f32;
+            let r = (start_r as f32 + t * (end_r as f32 - start_r as f32)) as u8;
+            let g = (start_g as f32 + t * (end_g as f32 - start_g as f32)) as u8;
+            let b = (start_b as f32 + t * (end_b as f32 - start_b as f32)) as u8;
+            format!("#{:02X}{:02X}{:02X}", r, g, b)
+        })
+        .collect()
+}
+
 #[derive(PartialEq, Clone, Copy, Debug)]
 pub enum ChartType {
     Artists,
@@ -161,17 +179,17 @@ pub fn chart_view(props: &ChartViewProps) -> Html {
     html! {
     <div class="flex flex-col items-center justify-center h-full">
       <div class="flex flex-row items-center justify-center w-full">
-        <a class="logo-container w-1/3 flex flex-col items-center mb-10" href="/">
-          <img src="/assets/logo/logo.svg" alt="logo" class="logo mb-4 w-60" />
+        <a class="logo-container w-1/4 flex flex-col items-center mb-10" href="/">
+          <img src="/assets/logo.svg" alt="logo" class="logo mb-4 w-60" />
           <h2 class="text-4xl text-center"> { "ReWrapped" } </h2>
         </a>
-        <p class="text-6xl text-text-base ml-4 text-center w-full">
+        <p class="text-4xl text-text-base ml-4 text-center w-full">
                    { props.chart_type.get_title() }
         </p>
       </div>
 
       <div class="w-full  h-full flex flex-col items-center">
-        <h3 class="text-2xl font-medium mb-4 text-gray-700"> {props.chart_type.get_message()  } </h3>
+        <h3 class="text-xl font-medium mb-4 text-gray-700"> {props.chart_type.get_message()  } </h3>
             if *loading {
                 <span class="loading loading-dots loading-lg"></span>
             }

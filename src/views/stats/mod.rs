@@ -9,108 +9,47 @@ pub mod chart;
 #[function_component(StatsHome)]
 pub fn stats_home() -> Html {
     let navigator = use_navigator().unwrap();
+
+    // Define a collection of chart types and their respective labels
+    let chart_buttons = vec![
+        (ChartType::Artists, "Artists"),
+        (ChartType::Songs, "Songs"),
+        (ChartType::Albums, "Albums"),
+        (ChartType::Week, "Week"),
+        (ChartType::Months, "Months"),
+        (ChartType::Platform, "Platform"),
+        (ChartType::Country, "Country"),
+        (ChartType::Days, "Days"),
+        (ChartType::Day, "Day"),
+    ];
+
     html! {
-           <div><h2>{"Charts"}</h2>
-       <div class="grid grid-cols-2 gap-4">
-    <button
-           class="btn btn-primary text-2xl font-semibold text-white py-3 cursor-pointer rounded-lg h-16"
-           onclick={Callback::from({
-               let navigator = navigator.clone();
-               move |_| {
-                   navigator.push(&Route::StatCharts { chart_type: ChartType::Artists });
-               }
-           })}
-       >
-           {"Artists"}
-       </button>
-       <button
-           class="btn btn-primary text-2xl font-semibold text-white py-3 cursor-pointer rounded-lg h-16"
-           onclick={Callback::from({
-               let navigator = navigator.clone();
-               move |_| {
-                   navigator.push(&Route::StatCharts { chart_type: ChartType::Songs });
-               }
-           })}
-       >
-           {"Songs"}
-       </button>
-       <button
-           class="btn btn-primary text-2xl font-semibold text-white py-3 cursor-pointer rounded-lg h-16"
-           onclick={Callback::from({
-               let navigator = navigator.clone();
-               move |_| {
-                   navigator.push(&Route::StatCharts { chart_type: ChartType::Albums });
-               }
-           })}
-       >
-           {"Albums"}
-       </button>
-       <button
-           class="btn btn-primary text-2xl font-semibold text-white py-3 cursor-pointer rounded-lg h-16"
-           onclick={Callback::from({
-               let navigator = navigator.clone();
-               move |_| {
-                   navigator.push(&Route::StatCharts { chart_type: ChartType::Week });
-               }
-           })}
-       >
-           {"Week"}
-       </button>
-       <button
-           class="btn btn-primary text-2xl font-semibold text-white py-3 cursor-pointer rounded-lg h-16"
-           onclick={Callback::from({
-               let navigator = navigator.clone();
-               move |_| {
-                   navigator.push(&Route::StatCharts { chart_type: ChartType::Months });
-               }
-           })}
-       >
-           {"Months"}
-       </button>
-       <button
-           class="btn btn-primary text-2xl font-semibold text-white py-3 cursor-pointer rounded-lg h-16"
-           onclick={Callback::from({
-               let navigator = navigator.clone();
-               move |_| {
-                   navigator.push(&Route::StatCharts { chart_type: ChartType::Platform });
-               }
-           })}
-       >
-           {"Platform"}
-       </button>
-       <button
-           class="btn btn-primary text-2xl font-semibold text-white py-3 cursor-pointer rounded-lg h-16"
-           onclick={Callback::from({
-               let navigator = navigator.clone();
-               move |_| {
-                   navigator.push(&Route::StatCharts { chart_type: ChartType::Country });
-               }
-           })}
-       >
-           {"Country"}
-       </button>
-        <button
-           class="btn btn-primary text-2xl font-semibold text-white py-3 cursor-pointer rounded-lg h-16"
-           onclick={Callback::from({
-               let navigator = navigator.clone();
-               move |_| {
-                   navigator.push(&Route::StatCharts { chart_type: ChartType::Days });
-               }
-           })}
-       >
-           {"Days"}
-       </button>
-    <button
-           class="btn btn-primary text-2xl font-semibold text-white py-3 cursor-pointer rounded-lg h-16"
-           onclick={Callback::from({
-               let navigator = navigator.clone();
-               move |_| {
-                   navigator.push(&Route::StatCharts { chart_type: ChartType::Day });
-               }
-           })}
-       >
-           {"Day"}
-       </button>
-       </div></div>
-       }
+        <div>
+    <div class="header flex items-center">
+            <a class="logo-container w-1/3 flex flex-col items-center mb-20" href="/">
+                <img src="assets/logo.svg" alt="logo" class="logo mb-4 w-60" />
+                <h2 class="text-3xl text-center"> { "ReWrapped" } </h2>
+            </a>
+            <div class="title-container w-3/4 ">
+                <h1 class="text-4xl text-center"> { "Statistics" } </h1>
+            </div>
+        </div>
+            <div class="grid  gap-4 sm:grid-cols-2 sm:auto-rows-fr">
+                // Generate buttons dynamically using a map and a loop
+                {for chart_buttons.into_iter().map(|(chart_type, label)| {
+                    let navigator = navigator.clone();
+                    html! {
+                        <button
+                            class="mbtn text-2xl font-semibold  h-16 w-40"
+                            onclick={Callback::from(move |_| {
+                                navigator.push(&Route::StatCharts { chart_type: chart_type.clone() });
+                            })}
+                        >
+                            {label}
+                        </button>
+                    }
+                })}
+            </div>
+        </div>
+    }
 }

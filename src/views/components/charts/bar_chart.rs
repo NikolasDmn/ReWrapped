@@ -3,17 +3,25 @@ use serde_json::to_string;
 use wasm_bindgen::prelude::*;
 use yew::prelude::*;
 
+use crate::views::stats::chart::get_gradient;
+
 #[derive(Serialize, Clone, PartialEq, Debug)]
 pub struct BarChartData {
     pub name: String,
     pub value: f32,
+    pub color: String,
 }
 
 impl BarChartData {
-    pub fn convert(value: Vec<(String, f32)>) -> Vec<Self> {
-        value
-            .into_iter()
-            .map(|(name, value)| BarChartData { name, value })
+    pub fn convert(data: Vec<(String, f32)>) -> Vec<Self> {
+        let colours = get_gradient("#10b981", "#4ade80", data.len());
+        data.into_iter()
+            .zip(colours)
+            .map(|((name, value), color)| Self {
+                name,
+                value,
+                color: color.to_string(),
+            })
             .collect()
     }
 }

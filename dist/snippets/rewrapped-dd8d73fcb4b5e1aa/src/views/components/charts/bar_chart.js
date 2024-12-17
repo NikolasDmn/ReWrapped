@@ -3,6 +3,7 @@ export function create_bar_chart(data) {
   const parsedData = JSON.parse(data);
   const series = parsedData.map((item) => item.value);
   const categories = parsedData.map((item) => item.name);
+  const colors = parsedData.map((item) => item.color);
   const chartConfig = {
     series: [
       {
@@ -47,7 +48,7 @@ export function create_bar_chart(data) {
     dataLabels: {
       position: "top",
     },
-    colors: ["#4CAF50"],
+    colors: colors,
     stroke: {
       show: true,
       width: 2,
@@ -61,8 +62,8 @@ export function create_bar_chart(data) {
     },
     plotOptions: {
       bar: {
-        borderRadius: 6, // Add this to create rounded corners
-        distributed: true, // Rounds individual bars
+        borderRadius: 6,
+        distributed: true,
       },
     },
   };
@@ -75,7 +76,7 @@ export function create_bar_chart(data) {
   while (chartContainer.firstChild) {
     chartContainer.removeChild(chartContainer.firstChild);
   }
-  //render the chart in the container
+  // Render the chart in the container
   const chart = new ApexCharts(chartContainer, chartConfig);
   chart.render();
 }

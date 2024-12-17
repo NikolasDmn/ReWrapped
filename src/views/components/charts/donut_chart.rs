@@ -4,6 +4,8 @@ use yew::prelude::*;
 use serde::Serialize;
 use serde_json::to_string;
 
+use crate::views::stats::chart::get_gradient;
+
 #[derive(Serialize, Clone, PartialEq, Debug)]
 pub struct PieChartData {
     pub name: String,
@@ -17,7 +19,7 @@ pub struct PieChartProps {
 }
 impl PieChartData {
     pub fn convert(data: Vec<(String, f32)>) -> Vec<Self> {
-        let colours = ["#189a46", "#3eaf61", "#5bc47b", "#76d996", "#91eeb1"];
+        let colours = get_gradient("#10b981", "#4ade80", data.len());
         data.into_iter()
             .zip(colours)
             .map(|((name, value), color)| Self {

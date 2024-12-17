@@ -3,6 +3,8 @@ use serde_json::to_string;
 use wasm_bindgen::prelude::*;
 use yew::prelude::*;
 
+use crate::views::stats::chart::get_gradient;
+
 #[derive(Serialize, Clone, PartialEq, Debug)]
 pub struct PolarAreaChartData {
     pub name: String,
@@ -14,12 +16,8 @@ impl PolarAreaChartData {
     pub fn convert(data: Vec<(String, f32)>) -> Vec<Self> {
         let mut data = data.clone();
         data.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
-        let colours = [
-            "#189a46", "#209e4b", "#27a14f", "#2ea554", "#34a858", "#3aac5d", "#3fb062", "#44b366",
-            "#49b76b", "#4eba70", "#53be74", "#58c279", "#5dc57d", "#62c982", "#67cd87", "#6bd08b",
-            "#70d490", "#75d895", "#79db99", "#7edf9e", "#83e3a3", "#88e7a8", "#8ceaac", "#91eeb1",
-        ];
 
+        let colours = get_gradient("#10b981", "#4ade80", data.len());
         let mut data: Vec<Self> = data
             .into_iter()
             .zip(colours)

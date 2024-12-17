@@ -2,11 +2,13 @@ use std::fmt::Result;
 use std::thread;
 
 use crate::data_parser::playback_record::PlaybackRecord;
+use crate::data_parser::processing::filter_by;
 use crate::Route;
 
 use super::components::data_context::DataContext;
 use super::components::file_upload::FileInput;
 use chrono::format;
+use chrono::prelude::*;
 use gloo::console::log;
 use gloo::file::FileReadError;
 use rayon::iter::IntoParallelIterator;
@@ -39,16 +41,22 @@ pub fn FileUploadView() -> Html {
             if *file_state != FileState::Processing {
                 return;
             }
-            wasm_bindgen_futures::spawn_local(async move {
-                let parsed_data = PlaybackRecord::from_jsons(&file_contents);
-                match parsed_data {
-                    Ok(data) => {
-                        data_context.dispatch(data);
-                        file_state.set(FileState::Processed);
-                    }
-                    Err(e) => navigator.push(&Route::Home),
+
+            let parsed_data = PlaybackRecord::from_jsons(&file_contents);
+
+            match parsed_data {
+                Ok(data) => {
+                    data_context.dispatch(filter_by(&data, |record| {
+                        record.ts.date_naive()
+                            >= Utc::now()
+                                .with_year(Utc::now().year() - 1)
+                                .unwrap()
+                                .date_naive()
+                    }));
+                    file_state.set(FileState::Processed);
                 }
-            });
+                Err(e) => navigator.push(&Route::DataError),
+            }
         }
     });
     let on_file_ammount = {
@@ -88,15 +96,15 @@ pub fn FileUploadView() -> Html {
     html! {
         <div class="grid grid-rows-[50%_50%] h-full w-full">
         <div class="flex flex-col items-center justify-center">
-          <img src="assets/logo/logo.svg" alt="logo" class="w-full max-h-[30vh]" />
+          <img src="assets/logo.svg" alt="logo" class="w-full max-h-[30vh]" />
           <h1 class="text-8xl text-center font-bold my-8">{"ReWrapped"}</h1>
         </div>
 
         <div class="flex flex-col items-center justify-center">
             if *file_state == FileState::Processed {
-                <button onclick={on_button_click} class="btn btn-primary text-4xl font-semibold text-white py-3 cursor-pointer rounded-lg h-16"> {"Get ReWrapped!"}</button>
+               <button onclick={on_button_click} class="mbtn text-4xl font-semibold  py-3 h-16"> {"Get ReWrapped!"}</button>
             } else if *file_state == FileState::Processing {
-                <div class="flex items-center justify-center w-1/2 bg-primary text-xl font-semibold text-white py-3 rounded-lg">{"Proccessing..."}</div>
+                <div class="flex items-center justify-center w-1/2 text-xl font-semibold py-3 mbtn">{"Proccessing..."}</div>
                 <p class="text-base text-gray-400 mt-8 hover:underline text-center">
                         { "This may take a while..." }
                 </p>

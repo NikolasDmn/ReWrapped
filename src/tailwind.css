@@ -17,6 +17,20 @@
   * {
      	  font-family: "Helvetica", sans-serif !important;
     }
+    body {
+  background-image: url('/assets/background.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  @media (orientation: portrait) {
+  background-image: url('/assets/background_portait.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  }
+  .mbtn {
+    @apply text-white py-3 cursor-pointer rounded-lg bg-gradient-to-r from-emerald-500 to-green-400 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl 
+  }
+}
 }
 @layer components {
 .app {
